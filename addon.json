@@ -1,0 +1,11 @@
+{
+	"title"		:	"Image Reference",
+	"type"		:	"tool",
+	"tags"		:	[ "build" ],
+	"ignore"	:
+	[
+		"addon.txt",
+		"*.md",
+		"*.git*"
+	]
+}

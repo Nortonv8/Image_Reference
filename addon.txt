@@ -1,0 +1,10 @@
+"AddonInfo"
+{
+	"name"		"Image Reference"
+	"version"	"Git"
+	"up_date"	"18/02/13"
+	"author_name"	"Nortonv8 & Dr. Matt"
+	"author_email"	"nortonv8@gmail.com"
+	
+	"info"		"A useful tool to help builders"
+}
