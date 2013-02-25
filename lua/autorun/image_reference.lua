@@ -46,6 +46,7 @@ if CLIENT then
 		</table>
 		</div>
 		]]
+		
 		return [[
 		<!DOCTYPE html>
 		<html>
@@ -67,7 +68,9 @@ if CLIENT then
 
 	function imgref_menu( ply )
 		if IsValid(ImgrefMenu) and ImgrefMenu:IsVisible() then ImgrefMenu:Close() return end
-
+		
+		local LastSize={0,0}
+		
 		ImgrefMenu = vgui.Create( "DFrame" )
 		ImgrefMenu:SetSize( ScrW()*0.3, ScrH()*0.3 )
 		ImgrefMenu:SetPos( ScrW()*0.02, ScrH()*0.02 )
@@ -98,11 +101,19 @@ if CLIENT then
 			ImageCanvas:SetHTML(GenerateHTML(width(),height(),string.Trim(URLEntry:GetValue())))
 			ImgrefMenu:SetMouseInputEnabled( false )
 			ImgrefMenu:SetKeyboardInputEnabled( false )
-			ImgrefMenu:SetSizable(false)
+			LastSize={width(),height()}
 		end
 		
 		function URLEntry:Think()
 			self:SetWidth(width())
+		end
+		
+		function ImageCanvas:Think()
+			if not ((width()==LastSize[1]) and (height()==LastSize[2])) then
+				ImageCanvas:SetSize(width(),height())
+				ImageCanvas:SetHTML(GenerateHTML(width(),height(),string.Trim(URLEntry:GetValue())))
+				LastSize={width(),height()}
+			end
 		end
 
 	end
