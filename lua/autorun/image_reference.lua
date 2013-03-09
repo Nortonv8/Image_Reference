@@ -65,11 +65,16 @@ if CLIENT then
 		</html>
 		]]
 	end
+	
+	local Focus=false
 
 	function imgref_menu( ply )
+		local GenerateCanvas
+		
 		if IsValid(ImgrefMenu) and ImgrefMenu:IsVisible() then ImgrefMenu:Close() return end
 		
 		local LastSize={0,0}
+		local Sheets={}
 		
 		ImgrefMenu = vgui.Create( "DFrame" )
 		ImgrefMenu:SetSize( ScrW()*0.3, ScrH()*0.3 )
@@ -85,35 +90,74 @@ if CLIENT then
 		ImgrefMenu:MakePopup()
 		
 		local width=function() return ImgrefMenu:GetWide() - 10 end
-		local height=function() return ImgrefMenu:GetTall() - 55 end
+		local height=function() return ImgrefMenu:GetTall() - 35 end
+		
+		local PropertySheet = vgui.Create( "DPropertySheet", ImgrefMenu )
+		PropertySheet:SetPos( 5,30 )
+		PropertySheet:SetSize( width(),height() )
 
-		local ImageCanvas = vgui.Create("HTML", ImgrefMenu)
-		ImageCanvas:SetPos(5,50)
-		ImageCanvas:SetSize(width(),height())
-
-		local URLEntry = vgui.Create( "DTextEntry", ImgrefMenu)
-		URLEntry:SetPos( 5,27 )
-		URLEntry:SetSize(620,20)
-		URLEntry:RequestFocus()
-		URLEntry:SetEnterAllowed( true )
-		URLEntry.OnEnter = function()
+		function GenerateCanvas(s)
+			local Panel=vgui.Create("DPanel")
+			
+			local ImageCanvas = vgui.Create("HTML",Panel)
+			ImageCanvas:SetPos(5,30)
 			ImageCanvas:SetSize(width(),height())
-			ImageCanvas:SetHTML(GenerateHTML(width(),height(),string.Trim(URLEntry:GetValue())))
-			ImgrefMenu:SetMouseInputEnabled( false )
-			ImgrefMenu:SetKeyboardInputEnabled( false )
-			LastSize={width(),height()}
-		end
-		
-		function URLEntry:Think()
-			self:SetWidth(width())
-		end
-		
-		function ImageCanvas:Think()
-			if not ((width()==LastSize[1]) and (height()==LastSize[2])) then
-				ImageCanvas:SetSize(width(),height())
+
+			local URLEntry = vgui.Create("DTextEntry",Panel)
+			URLEntry:SetPos( 5, 5 )
+			URLEntry:SetSize(620,20)
+			URLEntry:SetEnterAllowed( true )
+			URLEntry.OnEnter = function()
+				PropertySheet:SetSize(width(),height())
+				ImageCanvas:SetSize(width()-25,height()-70)
 				ImageCanvas:SetHTML(GenerateHTML(width(),height(),string.Trim(URLEntry:GetValue())))
+				ImgrefMenu:SetMouseInputEnabled( false )
+				ImgrefMenu:SetKeyboardInputEnabled( false )
 				LastSize={width(),height()}
 			end
+			URLEntry.OnGetFocus = function()
+				Focus=true
+			end
+			URLEntry.OnLoseFocus = function()
+				/*
+				if Focus then
+					ImgrefMenu:SetMouseInputEnabled( false )
+					ImgrefMenu:SetKeyboardInputEnabled( false )
+				end
+				*/
+				Focus=false
+			end
+			
+			function URLEntry:Think()
+				self:SetWidth(width()-25)
+			end
+			
+			function ImageCanvas:Think()
+				if not ((width()==LastSize[1]) and (height()==LastSize[2])) then
+					PropertySheet:SetSize(width(),height())
+					ImageCanvas:SetSize(width()-25,height()-70)
+					ImageCanvas:SetHTML(GenerateHTML(width(),height(),string.Trim(URLEntry:GetValue())))
+					LastSize={width(),height()}
+				end
+			end
+			
+			Sheets[#Sheets+1]=PropertySheet:AddSheet(s, Panel, "icon16/book.png")
+			PropertySheet:SetActiveTab(Sheets[#Sheets].Tab)
+			URLEntry:RequestFocus()
+		end
+		
+		GenerateCanvas("")
+		
+		local newCanvas = vgui.Create("DImageButton", ImgrefMenu)
+		newCanvas:SetPos(width()-105,5)
+		newCanvas:SetImage( "icon16/add.png" )
+		newCanvas:SizeToContents()
+		newCanvas:SetToolTip("Click to create a new image reference tab")
+		newCanvas.DoClick = function()
+			GenerateCanvas("")
+		end
+		function newCanvas:Think()
+			newCanvas:SetPos(width()-105,5)
 		end
 
 	end
@@ -127,7 +171,7 @@ if CLIENT then
 	end)
 	
 	hook.Add("OnContextMenuClose", "ImageRef-Plugin", function()
-		if IsValid(ImgrefMenu) and ImgrefMenu:IsVisible() then
+		if IsValid(ImgrefMenu) and ImgrefMenu:IsVisible() and not Focus then
 			ImgrefMenu:SetMouseInputEnabled( false )
 			ImgrefMenu:SetKeyboardInputEnabled( false )
 		end
