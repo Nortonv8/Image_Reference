@@ -15,6 +15,8 @@ To use this tool, bind a key to 'imgref_menu'. This can be done by typing in you
 
 Press the button while ingame, and copy-paste a internet link to a picture inside the box. The box may be moved and even resized before you press enter to load the image.
 
-Once the image is loaded, controls are returned to the user so you can build again. To move the box (resizing is unavailable after image load), simply hold c and you can.
+Once the image is loaded, controls are returned to the user so you can build again. To move the box or even resize the image, simply hold c and you can.
+
+New tabs can now be opened with the '+' button at the top of the panel, but they cannot be closed again until the entire panel is closed.
 
 To exit the image reference box, either hold c and press the 'X' on the box or press the binded key again.
